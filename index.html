@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+
+    <link rel="stylesheet" type="text/css" href="main.css">
+
+    <script src="./node_modules/web3/dist/web3.min.js"></script>
+
+</head>
+<body>
+    <div class="container">
+
+        <h1>HSBC Credit Scoring System</h1>
+
+        <h2 id="creditscore"></h2>
+
+        <label for="orgname" class="col-lg-2 control-label">Organization Name</label>
+        <input id="orgname" type="text">
+
+        <label for="orgaddress" class="col-lg-2 control-label">Organization Address</label>
+        <input id="orgaddress" type="text">
+
+        <label for="orgid" class="col-lg-2 control-label">Organization ID</label>
+        <input id="orgid" type="text">
+
+		<button id="button">Add Organization</button>
+		<button id="getButton">Get Organization</button>
+
+
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+
+    <script>
+
+        if (typeof web3 !== 'undefined') {
+            web3 = new Web3(web3.currentProvider);
+        } else {
+            // set the provider you want from Web3.providers
+            web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+        }
+
+        web3.eth.defaultAccount = web3.eth.accounts[0];
+        var CoursetroContract = web3.eth.contract([
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "org",
+				"type": "address"
+			},
+			{
+				"name": "name",
+				"type": "string"
+			},
+			{
+				"name": "id",
+				"type": "string"
+			}
+		],
+		"name": "addOrganization",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "orgAddress",
+				"type": "address"
+			}
+		],
+		"name": "getOrganization",
+		"outputs": [
+			{
+				"name": "_orgName",
+				"type": "string"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	}
+]);
+
+var Coursetro = CoursetroContract.at('0x0cd518d4e37c5b6aa5fee6675636125a4c4c99e4');
+console.log(Coursetro);
+
+        $("#getButton").click(function() {
+
+        Coursetro.getOrganization($("#orgaddress").val(),function(error, result){
+            if(!error)
+                {
+                    $("#creditscore").html(result + ' is your organization');
+                    console.log(result);
+                }
+            else
+                console.error(error);
+        });
+	});
+
+        $("#button").click(function() {
+            Coursetro.addOrganization($("#orgaddress").val(),$("#orgname").val(), $("#orgid").val());
+        });
+        
+    </script>
+
+</body>
+</html>
